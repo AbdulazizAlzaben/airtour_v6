@@ -14,7 +14,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 30),
         child: Column(
@@ -26,7 +26,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               children: [
                 Container(
                   height: 200,
-                  child: Image.asset('img/email.png'),
+                  child: Image.asset('images/email.png'),
                 ),
                 const Text(
                   'Check Your Email',

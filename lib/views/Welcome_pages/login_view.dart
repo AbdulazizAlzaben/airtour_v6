@@ -59,7 +59,7 @@ class _LoginViewState extends State<LoginView> {
               const SizedBox(height: 30),
               Container(
                 decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(5)),
                 child: TextField(
                   textAlign: TextAlign.center,
@@ -68,17 +68,17 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                       hintText: 'Enter Email',
                       enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.deepPurple)),
+                          borderSide: BorderSide(color: Colors.blue)),
                       focusedBorder: OutlineInputBorder(
                           borderSide:
-                              BorderSide(color: Colors.deepPurple, width: 3))),
+                              BorderSide(color: Colors.blue, width: 3))),
                 ),
               ),
               const SizedBox(height: 30),
               Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
-                    color: Colors.grey[100]),
+                    color: Colors.white),
                 child: TextField(
                   textAlign: TextAlign.center,
                   controller: _password,
@@ -86,11 +86,11 @@ class _LoginViewState extends State<LoginView> {
                   decoration: const InputDecoration(
                       hintText: 'Enter Password',
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.deepPurple),
+                        borderSide: BorderSide(color: Colors.blue),
                       ),
                       focusedBorder: OutlineInputBorder(
                           borderSide:
-                              BorderSide(color: Colors.deepPurple, width: 3))),
+                              BorderSide(color: Colors.blue, width: 3))),
                 ),
               ),
               const SizedBox(height: 30),

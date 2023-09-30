@@ -3,11 +3,14 @@
 import 'package:AirTours/constants/pages_route.dart';
 import 'package:AirTours/utilities/show_feedback.dart';
 import 'package:AirTours/views/Admin/add_admin.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/cloud/cloud_flight.dart';
 import '../../services/cloud/firestore_flight.dart';
+import '../../services_auth/auth_service.dart';
 import '../../utilities/show_error.dart';
+import '../One-Way/show_city_name_search.dart';
 
 class CreateFlight extends StatefulWidget {
   const CreateFlight({super.key});
@@ -37,6 +40,8 @@ class _CreateFlightState extends State<CreateFlight> {
   CloudFlight? _flight;
   late final FlightFirestore _flightsService;
   final formKey = GlobalKey<FormState>();
+  String? selectedCity1;
+  String? selectedCity2;
 
   @override
   void initState() {
@@ -45,8 +50,10 @@ class _CreateFlightState extends State<CreateFlight> {
   }
 
   void clearAllFields() {
-    from.clear();
-    to.clear();
+    setState(() {
+      selectedCity1 = null;
+      selectedCity2 = null;
+    });
     fromAir.clear();
     toAir.clear();
     numOfGuest.clear();
@@ -74,6 +81,10 @@ class _CreateFlightState extends State<CreateFlight> {
     required arrTime,
     required depTime,
   }) async {
+    Timestamp depDateStamp = Timestamp.fromDate(depDate);
+    Timestamp arrDateStamp = Timestamp.fromDate(arrDate);
+    Timestamp depTimeStamp = Timestamp.fromDate(depTime);
+    Timestamp arrTimeStamp = Timestamp.fromDate(arrTime);
     int intNumOfBus = int.parse(numOfBusiness);
     int intNumOfGuest = int.parse(numOfGuest);
     double guePrice = double.parse(guestPrice);
@@ -88,14 +99,32 @@ class _CreateFlightState extends State<CreateFlight> {
       numOfGuest: intNumOfGuest,
       guestPrice: guePrice,
       busPrice: businessPrice,
-      depDate: depDate,
-      arrDate: arrDate,
-      arrTime: arrTime,
-      depTime: depTime,
+      depDate: depDateStamp,
+      arrDate: arrDateStamp,
+      arrTime: arrTimeStamp,
+      depTime: depTimeStamp,
     );
 
     _flight = newFlight;
     return newFlight;
+  }
+
+  void _navigateToCitySelectionPage(BuildContext context, int num) async {
+    final city = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FromSearch(fromOrTo: 1)),
+    );
+
+    if (city != null) {
+      setState(() {
+        if (num == 1) {
+          selectedCity1 = city;
+        }
+        if (num == 2) {
+          selectedCity2 = city;
+        }
+      });
+    }
   }
 
   @override
@@ -125,50 +154,74 @@ class _CreateFlightState extends State<CreateFlight> {
                           Row(
                             children: [
                               Expanded(
-                                  child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return "Required Field";
-                                        }
-
-                                        if (!RegExp(r'^[a-z A-Z]+$')
-                                            .hasMatch(value)) {
-                                          return 'Please Enter a city';
-                                        } else {
-                                          return null;
-                                        }
-                                      },
-                                      controller: from,
-                                      keyboardType: TextInputType.text,
-                                      textAlign: TextAlign.center,
-                                      decoration: const InputDecoration(
-                                        icon:
-                                            Icon(Icons.flight_takeoff_rounded),
-                                        hintText: "From",
-                                      ))),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _navigateToCitySelectionPage(context, 1);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.all(5),
+                                    padding: const EdgeInsets.all(15),
+                                    width: double.infinity,
+                                    height: 70,
+                                    // decoration: BoxDecoration(
+                                    //   boxShadow: const [
+                                    //     BoxShadow(
+                                    //         blurRadius: 2, offset: Offset(0, 0))
+                                    //   ],
+                                    //   borderRadius: BorderRadius.circular(20),
+                                    //   color: Colors.white,
+                                    // ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.flight_takeoff),
+                                        SizedBox(width: 20.0),
+                                        Text(
+                                          selectedCity1 != null
+                                              ? '${selectedCity1}'
+                                              : 'Select from',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                               const SizedBox(
                                 width: 10,
                               ),
                               Expanded(
-                                  child: TextFormField(
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return "Required Field";
-                                        }
-
-                                        if (!RegExp(r'^[a-z A-Z]+$')
-                                            .hasMatch(value)) {
-                                          return 'Please Enter a city';
-                                        } else {
-                                          return null;
-                                        }
-                                      },
-                                      controller: to,
-                                      textAlign: TextAlign.center,
-                                      decoration: const InputDecoration(
-                                        icon: Icon(Icons.flight_land),
-                                        hintText: "To",
-                                      )))
+                                  child: GestureDetector(
+                                onTap: () {
+                                  _navigateToCitySelectionPage(context, 2);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.all(5),
+                                  padding: const EdgeInsets.all(15),
+                                  width: double.infinity,
+                                  height: 70,
+                                  // decoration: BoxDecoration(
+                                  //   boxShadow: const [
+                                  //     BoxShadow(
+                                  //         blurRadius: 2, offset: Offset(0, 0))
+                                  //   ],
+                                  //   borderRadius: BorderRadius.circular(20),
+                                  //   color: Colors.white,
+                                  // ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.flight_land),
+                                      SizedBox(width: 20.0),
+                                      Text(
+                                        selectedCity2 != null
+                                            ? '${selectedCity2}'
+                                            : 'Select to',
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ))
                             ],
                           ),
                           Row(
@@ -505,8 +558,8 @@ class _CreateFlightState extends State<CreateFlight> {
                                           selectedArrTime.minute);
 
                                       createFlight(
-                                          fromCity: from.text,
-                                          toCity: to.text,
+                                          fromCity: selectedCity1,
+                                          toCity: selectedCity2,
                                           fromAirport: fromAir.text,
                                           toAirport: toAir.text,
                                           numOfBusiness: numOfBusiness.text,
@@ -535,7 +588,27 @@ class _CreateFlightState extends State<CreateFlight> {
                               onPressed: () {
                                 Navigator.of(context).pushNamed(addAdminRoute);
                               },
-                              child: const Text('add new admin'))
+                              child: const Text('Add Admin')),
+                          ElevatedButton(
+                            onPressed: () {
+                              AuthService.firebase().logOut();
+                              Navigator.of(context).pushNamed(loginRoute);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                              child: Text(
+                                'Sign Out',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
